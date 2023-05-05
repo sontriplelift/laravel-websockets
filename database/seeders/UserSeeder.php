@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Comment;
+use App\Models\User;
 use Database\Seeders\Traits\DisableForeignKeys;
 use Database\Seeders\Traits\TruncateTable;
 use Illuminate\Database\Seeder;
 
-class CommentSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     use TruncateTable, DisableForeignKeys;
 
@@ -19,8 +19,8 @@ class CommentSeeder extends Seeder
     public function run()
     {
         $this->disableForeignKeys();
-        $this->truncate('comments');
-        Comment::factory(3)->create();
+        $this->truncate('users');
+        User::factory(10)->create();
         $this->enableForeignKeys();
     }
 }
