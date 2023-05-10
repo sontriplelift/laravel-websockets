@@ -15,13 +15,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::apiResource('users', UserController::class);
-
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/{user}', [UserController::class, 'show']);
-Route::post('/users', [UserController::class, 'store']);
-Route::patch('/users/{user}', [UserController::class, 'update']);
-Route::delete('/users/{user}', [UserController::class, 'destroy']);
+Route::prefix('v1')
+    ->group(function() {
+        require __DIR__ . '/api/v1/users.php';
+        require __DIR__ . '/api/v1/posts.php';
+        require __DIR__ . '/api/v1/comments.php';
+    });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
