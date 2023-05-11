@@ -24,9 +24,9 @@ class PostSeeder extends Seeder
         $this->disableForeignKeys();
         $this->truncate('posts');
 
-        $posts = Post::factory(3)
+        $posts = Post::factory(100)
             // ->has(Comment::factory(3), 'comments')
-            ->untitled()
+            // ->untitled()
             ->create();
 
         $posts->each(function (Post $post) {

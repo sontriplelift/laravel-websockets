@@ -14,9 +14,10 @@ class UserController extends Controller
      *
      * @return ResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::query()->get();
+        $pageSize = $request->page_size ?? 20;
+        $users = User::query()->paginate($pageSize);
 
         return UserResource::collection($users);
     }
@@ -30,8 +31,8 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $created = User::query()->create([
-            'title' => $request->title,
-            'body' => $request->body
+            'name' => $request->name,
+            'email' => $request->email
         ]);
         return new UserResource($created);
     }
@@ -57,8 +58,8 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $updated = $user->update([
-            'title' => $request->title ?? $user->title,
-            'body' => $request->body ?? $user->body
+            'name' => $request->name ?? $user->name,
+            'email' => $request->email ?? $user->email
         ]);
 
         if (!$updated) {
