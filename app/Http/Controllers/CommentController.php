@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use App\Repositories\CommentRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,13 +29,14 @@ class CommentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return CommentResource
      */
-    public function store(Request $request)
+    public function store(Request $request, CommentRepository $repository)
     {
-        $created = Comment::query()->create([
-            'body' => $request->body,
-            'user_id' => $request->user_id,
-            'post_id' => $request->post_id,
-        ]);
+        $created = $repository->create($request->only([
+            'body',
+            'user_id',
+            'post_id'
+        ]));
+
         return new CommentResource($created);
     }
 
@@ -56,23 +58,15 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return CommentResource | JsonResponse
      */
-    public function update(Request $request, Comment $comment)
+    public function update(Request $request, Comment $comment, CommentRepository $repository)
     {
-        $updated = $comment->update([
-            'body' => $request->body ?? $comment->body,
-            'user_id' => $request->user_id ?? $comment->user_id,
-            'post_id' => $request->post_id ?? $comment->post_id,
-        ]);
+        $updated = $repository->update($comment, $request->only([
+            'body',
+            'user_id',
+            'post_id'
+        ]));
 
-        if (!$updated) {
-            return new JsonResponse([
-                'errors' => [
-                    'Update failed.'
-                ]
-            ]);
-        } else {
-            return new CommentResource($comment);
-        }
+        return new CommentResource($comment);
     }
 
     /**
@@ -81,20 +75,12 @@ class CommentController extends Controller
      * @param  \App\Models\Comment  $comment
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Comment $comment)
+    public function destroy(Comment $comment, CommentRepository $repository)
     {
-        $deleted = $comment->forceDelete();
+        $deleted = $repository->forceDelete($comment);
 
-        if (!$deleted) {
-            return new JsonResponse([
-                'errors' => [
-                    'Delete failed.'
-                ]
-            ]);
-        } else {
-            return new JsonResponse([
-                'data' => 'Delete successfully.'
-            ]);
-        }
+        return new JsonResponse([
+            'data' => 'Delete successfully.'
+        ]);
     }
 }

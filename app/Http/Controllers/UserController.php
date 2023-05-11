@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -28,12 +29,14 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return UserResource
      */
-    public function store(Request $request)
+    public function store(Request $request, UserRepository $repository)
     {
-        $created = User::query()->create([
-            'name' => $request->name,
-            'email' => $request->email
-        ]);
+        $created = $repository->create($request->only([
+            'name',
+            'email',
+            'password'
+        ]));
+
         return new UserResource($created);
     }
 
@@ -55,22 +58,14 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return UserResource | JsonResponse
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, UserRepository $repository)
     {
-        $updated = $user->update([
-            'name' => $request->name ?? $user->name,
-            'email' => $request->email ?? $user->email
-        ]);
+        $user = $repository->update($user, $request->only([
+            'name',
+            'email'
+        ]));
 
-        if (!$updated) {
-            return new JsonResponse([
-                'errors' => [
-                    'Update failed.'
-                ]
-            ]);
-        } else {
-            return new UserResource($user);
-        }
+        return new UserResource($user);
     }
 
     /**
@@ -79,20 +74,12 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(User $user)
+    public function destroy(User $user, UserRepository $repository)
     {
-        $deleted = $user->forceDelete();
+        $deleted = $repository->forceDelete($user);
 
-        if (!$deleted) {
-            return new JsonResponse([
-                'errors' => [
-                    'Delete failed.'
-                ]
-            ]);
-        } else {
-            return new JsonResponse([
-                'data' => 'Delete successfully.'
-            ]);
-        }
+        return new JsonResponse([
+            'data' => 'Delete successfully.'
+        ]);
     }
 }
