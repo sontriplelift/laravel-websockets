@@ -9,6 +9,21 @@ class Post extends Model
 {
     use HasFactory;
 
+    protected $hidden = [
+        'title'
+    ];
+
+    protected $fillable = [
+        'title',
+        'body'
+    ];
+
+    // protected $guard = [];
+
+    protected $appends = [
+        'title_upper_case'
+    ];
+
     protected $casts = [
         'body' => 'array'
     ];

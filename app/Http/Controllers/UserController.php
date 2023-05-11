@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,39 +12,39 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return ResourceCollection
      */
     public function index()
     {
-        return new JsonResponse([
-            'data' => 'get all'
-        ]);
+        $users = User::query()->get();
+
+        return UserResource::collection($users);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return UserResource
      */
     public function store(Request $request)
     {
-        return new JsonResponse([
-            'data' => 'posted'
+        $created = User::query()->create([
+            'title' => $request->title,
+            'body' => $request->body
         ]);
+        return new UserResource($created);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\JsonResponse
+     * @return UserResource
      */
     public function show(User $user)
     {
-        return new JsonResponse([
-            'data' => $user
-        ]);
+        return new UserResource($user);
     }
 
     /**
@@ -51,13 +52,24 @@ class UserController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\User  $user
-     * @return \Illuminate\Http\JsonResponse
+     * @return UserResource | JsonResponse
      */
     public function update(Request $request, User $user)
     {
-        return new JsonResponse([
-            'data' => 'patched'
+        $updated = $user->update([
+            'title' => $request->title ?? $user->title,
+            'body' => $request->body ?? $user->body
         ]);
+
+        if (!$updated) {
+            return new JsonResponse([
+                'errors' => [
+                    'Update failed.'
+                ]
+            ]);
+        } else {
+            return new UserResource($user);
+        }
     }
 
     /**
@@ -68,8 +80,18 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        return new JsonResponse([
-            'data' => 'deleted'
-        ]);
+        $deleted = $user->forceDelete();
+
+        if (!$deleted) {
+            return new JsonResponse([
+                'errors' => [
+                    'Delete failed.'
+                ]
+            ]);
+        } else {
+            return new JsonResponse([
+                'data' => 'Delete successfully.'
+            ]);
+        }
     }
 }

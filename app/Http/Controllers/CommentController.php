@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CommentResource;
 use App\Models\Comment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -10,33 +12,39 @@ class CommentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return ResourceCollection
      */
     public function index()
     {
-        //
+        $comments = Comment::query()->get();
+
+        return CommentResource::collection($comments);
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return CommentResource
      */
     public function store(Request $request)
     {
-        //
+        $created = Comment::query()->create([
+            'title' => $request->title,
+            'body' => $request->body
+        ]);
+        return new CommentResource($created);
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return CommentResource
      */
     public function show(Comment $comment)
     {
-        //
+        return new CommentResource($comment);
     }
 
     /**
@@ -44,21 +52,46 @@ class CommentController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return CommentResource | JsonResponse
      */
     public function update(Request $request, Comment $comment)
     {
-        //
+        $updated = $comment->update([
+            'title' => $request->title ?? $comment->title,
+            'body' => $request->body ?? $comment->body
+        ]);
+
+        if (!$updated) {
+            return new JsonResponse([
+                'errors' => [
+                    'Update failed.'
+                ]
+            ]);
+        } else {
+            return new CommentResource($comment);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Comment  $comment
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Comment $comment)
     {
-        //
+        $deleted = $comment->forceDelete();
+
+        if (!$deleted) {
+            return new JsonResponse([
+                'errors' => [
+                    'Delete failed.'
+                ]
+            ]);
+        } else {
+            return new JsonResponse([
+                'data' => 'Delete successfully.'
+            ]);
+        }
     }
 }
