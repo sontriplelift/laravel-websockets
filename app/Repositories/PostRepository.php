@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Events\Models\Post\PostCreated;
 use App\Exceptions\GeneralJsonException;
 use App\Models\Post;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,8 @@ class PostRepository extends BaseRepository
             if($userIds = data_get($attributes, 'user_ids')) {
                 $created->users()->sync($userIds);
             }
+
+            event(new PostCreated($created));
 
             return $created;
         });
