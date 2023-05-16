@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostStoreRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Repositories\PostRepository;
@@ -27,10 +28,10 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  PostStoreRequest  $request
      * @return PostResource
      */
-    public function store(Request $request, PostRepository $repository)
+    public function store(PostStoreRequest $request, PostRepository $repository)
     {
         $created = $repository->create($request->only([
             'title',
