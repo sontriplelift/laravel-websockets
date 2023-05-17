@@ -6,9 +6,11 @@ use App\Http\Requests\PostStoreRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use App\Repositories\PostRepository;
+use App\Rules\IntegerArrayRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -25,19 +27,54 @@ class PostController extends Controller
         return PostResource::collection($posts);
     }
 
+    // /**
+    //  * Store a newly created resource in storage.
+    //  *
+    //  * @param  PostStoreRequest  $request
+    //  * @return PostResource
+    //  */
+    // public function store(PostStoreRequest $request, PostRepository $repository)
+    // {
+    //     $created = $repository->create($request->only([
+    //         'title',
+    //         'body',
+    //         'user_ids'
+    //     ]));
+
+    //     return new PostResource($created);
+    // }
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param  PostStoreRequest  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return PostResource
      */
-    public function store(PostStoreRequest $request, PostRepository $repository)
+    public function store(Request $request, PostRepository $repository)
     {
-        $created = $repository->create($request->only([
+        $payload = $request->only([
             'title',
             'body',
             'user_ids'
-        ]));
+        ]);
+        Validator::validate($payload,
+            [
+                'title' => ['string', 'required'],
+                'body' => ['string', 'required'],
+                'user_ids' => ['array',
+                    'required',
+                    new IntegerArrayRule()
+                ]
+            ],
+            [
+                'body.required' => 'Please enter a value for body.',
+            ],
+            [
+                'user_ids' => 'user ids'
+            ]
+        );
+
+        $created = $repository->create($payload);
 
         return new PostResource($created);
     }

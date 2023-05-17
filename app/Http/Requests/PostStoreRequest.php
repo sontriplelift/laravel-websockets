@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\IntegerArrayRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class PostStoreRequest extends FormRequest
@@ -26,7 +27,16 @@ class PostStoreRequest extends FormRequest
         return [
             'title' => ['string', 'required'],
             'body' => ['string', 'required'],
-            'user_ids' => ['array', 'required'],
+            'user_ids' => ['array',
+            'required',
+            new IntegerArrayRule()
+            // function ($attribute, $value, $fail) {
+            //     $integerOnly = collect($value)->every(fn ($element) => is_int($element));
+            //     if(!$integerOnly) {
+            //         $fail($attribute . ' can only be integers.');
+            //     }
+            // }
+        ],
         ];
     }
 
