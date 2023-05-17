@@ -8,10 +8,23 @@ use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+/**
+ * @group User Management
+ *
+ * APIs to manage the user resource
+ */
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of users.
+     *
+     * Get a list of users.
+     *
+     * @queryParam page_size int Size per page. Defaults to 20. Example:20
+     * @queryParam page int Page to view. Example:1
+     *
+     * @apiResourceCollection App\Http\Resources\UserResource
+     * @apiResourceModel App\Models\User
      *
      * @return ResourceCollection
      */
@@ -25,6 +38,11 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @bodyParam name string required Name of the user. Example: John Whick
+     * @bodyParam email string required Name of the user. Example: john@whick.com
+     * @apiResourceCollection App\Http\Resources\UserResource
+     * @apiResourceModel App\Models\User
      *
      * @param  \Illuminate\Http\Request  $request
      * @return UserResource
@@ -42,6 +60,11 @@ class UserController extends Controller
 
     /**
      * Display the specified resource.
+     *
+     * @urlParam id int required User ID
+     *
+     * @apiResourceCollection App\Http\Resources\UserResource
+     * @apiResourceModel App\Models\User
      *
      * @param  \App\Models\User  $user
      * @return UserResource
