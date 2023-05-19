@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Mail\VerifyMail;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -26,5 +28,9 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         //
+
+        VerifyEmail::toMailUsing(function ($notifiable, $url) {
+            return new VerifyMail($notifiable, $url);
+        });
     }
 }
