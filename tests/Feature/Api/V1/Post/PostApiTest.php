@@ -4,6 +4,7 @@ namespace Tests\Feature\Api\V1\Post;
 
 use App\Events\Models\Post\PostCreated;
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -13,6 +14,18 @@ use Tests\TestCase;
 class PostApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $user = User::factory(1)->create()->first();
+        $this->actingAs($user);
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+    }
 
     public function test_index()
     {
