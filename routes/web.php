@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\PlaygroundEvent;
 use App\Mail\WelcomeMail;
 use App\Models\Post;
 use App\Models\User;
@@ -44,10 +45,14 @@ if (App::environment('local')) {
         // $user = User::factory()->make();
         // Mail::to($user)->send(new WelcomeMail($user));
         // return null;
-        $url = URL::temporarySignedRoute('share-video', now()->addSeconds(30), [
-            'video' => 123
-        ]);
-        return $url;
+
+        // $url = URL::temporarySignedRoute('share-video', now()->addSeconds(30), [
+        //     'video' => 123
+        // ]);
+        // return $url;
+
+        event(new PlaygroundEvent());
+        return null;
     });
 
     Route::get('/shared/videos/{video}', function (Request $request, $video) {
