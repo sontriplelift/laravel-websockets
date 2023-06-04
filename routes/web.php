@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\ChatMessageEvent;
 use App\Events\PlaygroundEvent;
 use App\Mail\WelcomeMail;
 use App\Models\Post;
@@ -50,7 +51,6 @@ if (App::environment('local')) {
         //     'video' => 123
         // ]);
         // return $url;
-
         event(new PlaygroundEvent());
         return null;
     });
@@ -58,4 +58,13 @@ if (App::environment('local')) {
     Route::get('/shared/videos/{video}', function (Request $request, $video) {
         return 'git gud';
     })->name('share-video')->middleware('signed');
+
+    Route::get('/ws', function() {
+        return view('websocket');
+    });
+
+    Route::post('chat-message', function(Request $request) {
+        event(new ChatMessageEvent($request->message));
+        return null;
+    });
 }
